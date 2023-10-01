@@ -13,7 +13,9 @@ import tarfile
 import argparse
 
 
-def parsePackage(srcPath: str, outputBaseDir: str = None) -> (bool, str):
+def parsePackage(
+    srcPath: str, outputBaseDir: str = None, force: bool = False
+) -> (bool, str):
     """Extract UnityPackage"""
     name, extension = os.path.splitext(srcPath)
 
@@ -27,7 +29,9 @@ def parsePackage(srcPath: str, outputBaseDir: str = None) -> (bool, str):
     # can't proceed if the output dir exists already
     # but if the temp working dir exists, we clean it out before extracting
     if os.path.exists(outputDir):
-        return (False, f"Output dir {outputDir} exists. Aborting.")
+        if not force:
+            return (False, f"Output dir {outputDir} exists. Aborting.")
+        shutil.rmtree(outputDir)
 
     if os.path.exists(workingDir):
         shutil.rmtree(workingDir)
@@ -104,6 +108,13 @@ parser.add_argument(
     help=".unitypackage file. The part of the filename before the extension will be used as the name of the directory that the packages contents will be extracted to.",
 )
 parser.add_argument(
+    "-f",
+    "--force",
+    default=False,
+    action="store_true",
+    help="If the file already exists, delete it and start over.",
+)
+parser.add_argument(
     "-o",
     "--output_dir",
     type=str,
@@ -114,7 +125,7 @@ print(args)
 if args.input_file is not None:
     # CUI
     (successful, msg) = parsePackage(
-        srcPath=args.input_file, outputBaseDir=args.output_dir
+        srcPath=args.input_file, outputBaseDir=args.output_dir, force=args.force
     )
     if not successful:
         print(msg)
