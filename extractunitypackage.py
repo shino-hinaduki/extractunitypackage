@@ -12,6 +12,10 @@ import sys
 import tarfile
 import argparse
 
+import tkinter as tk
+from tkinter import filedialog
+from tkinterdnd2 import TkinterDnD, DND_FILES
+
 
 def parsePackage(
     srcPath: str, outputBaseDir: str = None, force: bool = False
@@ -21,7 +25,7 @@ def parsePackage(
 
     outputDir = ""
     if outputBaseDir is None:
-        outputDir = "./" + name
+        outputDir = os.path.join(os.path.dirname(srcPath), name)
     else:
         outputDir = os.path.join(outputBaseDir, name)
     workingDir = "./.working"
@@ -100,36 +104,72 @@ def parsePackage(
     return (True, outputDir)
 
 
-parser = argparse.ArgumentParser(description="UnityPackage Extractor")
-parser.add_argument(
-    "-i",
-    "--input_file",
-    type=str,
-    help=".unitypackage file. The part of the filename before the extension will be used as the name of the directory that the packages contents will be extracted to.",
-)
-parser.add_argument(
-    "-f",
-    "--force",
-    default=False,
-    action="store_true",
-    help="If the file already exists, delete it and start over.",
-)
-parser.add_argument(
-    "-o",
-    "--output_dir",
-    type=str,
-    help="optional path where the package's files will be extracted to. (If omitted, the current working directory is used)",
-)
-args = parser.parse_args()
-print(args)
-if args.input_file is not None:
-    # CUI
-    (successful, msg) = parsePackage(
-        srcPath=args.input_file, outputBaseDir=args.output_dir, force=args.force
+class ExtractApp(TkinterDnD.Tk):
+    def __init__(self, width: int = 640, height: int = 480):
+        super().__init__()
+
+        self.title("UnityPackage Extractor")
+        self.geometry(f"{width}x{height}")
+        self.minsize(width, height)
+
+        self.drop_target_register(DND_FILES)
+        self.dnd_bind("<<Drop>>", self.extract)
+
+        # configure
+        confFrame = tk.Frame(self)
+        confFrame.grid(row=3, column=1)
+        confFrame.columnconfigure(0, weight=1)
+        extractButton = tk.Button(confFrame, text="Extract", command=self.extract)
+        extractButton.grid(row=0, column=0)
+
+        # logs
+
+    def extract(self, e):
+        print(e.data)
+        (successful, msg) = parsePackage(
+            srcPath=e.data, outputBaseDir=None, force=False
+        )
+        if not successful:
+            print(msg)
+        else:
+            print("")
+            print(f"Done. Result saved in {msg}.")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="UnityPackage Extractor")
+    parser.add_argument(
+        "-i",
+        "--input_file",
+        type=str,
+        help=".unitypackage file. The part of the filename before the extension will be used as the name of the directory that the packages contents will be extracted to.",
     )
-    if not successful:
-        print(msg)
-        sys.exit(1)
+    parser.add_argument(
+        "-f",
+        "--force",
+        default=False,
+        action="store_true",
+        help="If the file already exists, delete it and start over.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output_dir",
+        type=str,
+        help="optional path where the package's files will be extracted to. (If omitted, the current working directory is used)",
+    )
+    args = parser.parse_args()
+    if args.input_file is not None:
+        # CUI
+        (successful, msg) = parsePackage(
+            srcPath=args.input_file, outputBaseDir=args.output_dir, force=args.force
+        )
+        if not successful:
+            print(msg)
+            sys.exit(1)
+        else:
+            print("")
+            print(f"Done. Result saved in {msg}.")
     else:
-        print("")
-        print(f"Done. Result saved in {msg}.")
+        # gui
+        app = ExtractApp()
+        app.mainloop()
