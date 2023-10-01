@@ -1,2 +1,5 @@
 .DS_Store
-
+dist
+build
+extractunitypackage.spec
+sample_asset/sample*/**/*
