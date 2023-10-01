@@ -115,14 +115,8 @@ class ExtractApp(TkinterDnD.Tk):
         self.drop_target_register(DND_FILES)
         self.dnd_bind("<<Drop>>", self.extract)
 
-        # configure
-        confFrame = tk.Frame(self)
-        confFrame.grid(row=3, column=1)
-        confFrame.columnconfigure(0, weight=1)
-        extractButton = tk.Button(confFrame, text="Extract", command=self.extract)
-        extractButton.grid(row=0, column=0)
-
-        # logs
+        label = tk.Label(self.master, text=".unitypackage drop here", justify="center", font=("Segoe UI", "24", "bold"))
+        label.pack(expand=True)
 
     def extract(self, e):
         print(e.data)
