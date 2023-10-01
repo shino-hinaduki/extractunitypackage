@@ -1,5 +1,7 @@
 # UnityPackage Extractor
 
+[![Python application](https://github.com/shino-hinaduki/extractunitypackage/actions/workflows/package-python-app.yml/badge.svg?branch=master)](https://github.com/shino-hinaduki/extractunitypackage/actions/workflows/package-python-app.yml)
+
 Extracts files/folders from a .unitypackage file, reading the 'pathname'
 files it contains to build a "readable" file/folder structure which all
 the files will be extracted and renamed to match.
