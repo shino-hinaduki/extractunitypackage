@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  extract:
+    build:
+      context: ./
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app
+    command: python3 extractunitypackage.py -h
+  package:
+    build:
+      context: ./
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app
+    command: bash ./build.sh
