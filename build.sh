@@ -1,3 +1,3 @@
 #!/bin/bash -uex
 pip install pyinstaller
-pyinstaller extractunitypackage.py --onefile --clean
+pyinstaller extractunitypackage.py --onefile --clean --noconfirm --collect-all extractunitypackage --collect-all tkinterdnd2
